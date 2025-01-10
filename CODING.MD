@@ -10,7 +10,7 @@
 4. [Синтаксис Ассемблера](#синтаксис-ассемблера)
     - [Структура Программы](#структура-программы)
     - [Комментарии](#комментарии)
-    - [Ярлыки (Labels)](#ярлыки-labels)
+    - [метки (Labels)](#метки-labels)
     - [Директивы](#директивы)
 5. [Регистры](#регистрrы)
 6. [Банковая Схема Памяти](#банковая-схема-памяти)
@@ -132,19 +132,19 @@ VCPU использует банковую схему памяти для упр
 
 ### Использование Банков
 
-Банки памяти необходимы только для работы с данными, а также для команд перехода (`JMP`, `CALL`). Инструкции `STORE` и `LOAD` автоматически учитывают текущий банк. Компилятор автоматически вставляет инструкции `BANK` перед командами, работающими с другим банком, если это необходимо.
+Банки памяти необходимы только для работы с данными (`STORE` и `LOAD`), а также для команд перехода (`JMP`, `CALL`).  Компилятор подскажет в ошибке компиляции, куда надо вставить инструкцию `BANK` перед командами, и с каким дначением
 
 **Пример переключения банка для работы с данными:**
 
 ```assembly
 BANK 0x01
-STOREV 0x10, R1
-LOADR R2, 0x10
+STOREV 0x10 R1
+LOADR R2 0x10
 ```
 
 ### Управление Банками в Компиляторе
 
-Компилятор сам отслеживает текущий банк и добавляет инструкцию `BANK` при необходимости, чтобы обеспечить корректный доступ к данным или переходам между различными банками памяти.
+Компилятор сам отслеживает текущий банк и сообщает о нём, если вы неправильно их указали `BANK`, чтобы обеспечить корректный доступ к данным или переходам между различными банками памяти.
 
 ## Инструкции
 
@@ -158,40 +158,40 @@ NOP
 ```
 
 #### SET
-**SET REG, VAL** — Устанавливает значение `VAL` в регистр `REG`.
+**SET REG VAL** — Устанавливает значение `VAL` в регистр `REG`.
 
 ```assembly
-SET R1, 10
+SET R1 10
 ```
 
 #### MOV
-**MOV REG1, REG2** — Копирует значение из `REG2` в `REG1`.
+**MOV REG1 REG2** — Копирует значение из `REG2` в `REG1`.
 
 ```assembly
-MOV R2, R1
+MOV R2 R1
 ```
 
 #### ADD
-**ADD REG1, REG2** — Добавляет значение `REG2` к `REG1`. Результат сохраняется в `REG1`.
+**ADD REG1 REG2** — Добавляет значение `REG2` к `REG1`. Результат сохраняется в `REG1`.
 
 ```assembly
-ADD R1, R2
+ADD R1 R2
 ```
 
 #### SUB
-**SUB REG1, REG2** — Вычитает значение `REG2` из `REG1`. Результат сохраняется в `REG1`.
+**SUB REG1 REG2** — Вычитает значение `REG2` из `REG1`. Результат сохраняется в `REG1`.
 
 ```assembly
-SUB R1, R2
+SUB R1 R2
 ```
 
 #### AND, OR, XOR
 Логические операции над регистрами.
 
 ```assembly
-AND R1, R2
-OR R1, R2
-XOR R1, R2
+AND R1 R2
+OR R1 R2
+XOR R1 R2
 ```
 
 ### Управление Потоком Выполнения
@@ -232,63 +232,63 @@ RET
 ```
 
 #### CMP
-**CMP REG1, REG2** — Сравнивает `REG1` и `REG2`, устанавливает флаг `ZF`.
+**CMP REG1 REG2** — Сравнивает `REG1` и `REG2`, устанавливает флаг `ZF`.
 
 ```assembly
-CMP R1, R2
+CMP R1 R2
 ```
 
 ### Работа с Памятью
 
 #### STOREV
-**STOREV ADDR, VAL** — Сохраняет значение `VAL` по адресу `ADDR`.
+**STOREV ADDR VAL** — Сохраняет значение `VAL` по адресу `ADDR`.
 
 ```assembly
-STOREV 0x10, R1
+STOREV 0x10 R1
 ```
 
 #### STORER
-**STORER ADDR, REG** — Сохраняет значение из `REG` по адресу `ADDR`.
+**STORER ADDR REG** — Сохраняет значение из `REG` по адресу `ADDR`.
 
 ```assembly
-STORER 0x20, R2
+STORER 0x20 R2
 ```
 
 #### STOREM
-**STOREM ADDR1, ADDR2** — Сохраняет значение из `ADDR2` по адресу `ADDR1`.
+**STOREM ADDR1 ADDR2** — Сохраняет значение из `ADDR2` по адресу `ADDR1`.
 
 ```assembly
-STOREM 0x30, 0x40
+STOREM 0x30 0x40
 ```
 
 #### LOADR
-**LOADR REG, ADDR** — Загружает значение из `ADDR` в `REG`.
+**LOADR REG ADDR** — Загружает значение из `ADDR` в `REG`.
 
 ```assembly
-LOADR R1, 0x50
+LOADR R1 0x50
 ```
 
 ### Ввод/Вывод
 
 #### SETPX
-**SETPX REG1, REG2, [REG3]** — Устанавливает пиксель на координатах `(x, y)` с яркостью из `REG3`.
+**SETPX REG1 REG2 REG3** — Устанавливает пиксель на координатах `(x, y)` с яркостью из `REG3`.
 
 ```assembly
-SETPX R1, R2, R3
+SETPX R1 R2 R3
 ```
 
 #### CLRPX
-**CLRPX REG1, REG2** — Очищает пиксель на координатах `(x, y)`.
+**CLRPX REG1 REG2** — Очищает пиксель на координатах `(x, y)`.
 
 ```assembly
-CLRPX R1, R2
+CLRPX R1 R2
 ```
 
 #### DIGIT
-**DIGIT REG1, REG2** — Выводит число на сегментный дисплей на позиции из `REG1` со значением из `REG2`.
+**DIGIT REG1 REG2** — Выводит число на сегментный дисплей на позиции из `REG1` со значением из `REG2`. Позиция 0 включает автоматическое выравнивание цифр по правой стороне.
 
 ```assembly
-DIGIT R1, R2
+DIGIT R1 R2
 ```
 
 #### CLEAR
@@ -308,17 +308,17 @@ GETKEY R1
 ### Работа с Кассетами
 
 #### CREAD
-**CREAD REG1, REG2** — Загружает секцию кассеты из `REG2` начиная с адреса `REG1`.
+**CREAD REG1 REG2** — Загружает секцию кассеты из `REG2` начиная с адреса `REG1`.
 
 ```assembly
-CREAD R1, R2
+CREAD R1 R2
 ```
 
 #### CWRITE
-**CWRITE REG1, REG2** — Записывает данные из памяти начиная с `REG1` в секцию кассеты `REG2`.
+**CWRITE REG1 REG2** — Записывает данные из памяти начиная с `REG1` в секцию кассеты `REG2`.
 
 ```assembly
-CWRITE R1, R2
+CWRITE R1 R2
 ```
 
 #### CSTAT
@@ -329,10 +329,10 @@ CSTAT R1
 ```
 
 #### CINFO
-**CINFO REG1, REG2** — Получает информацию о кассете. Тип информации задается в `REG1`, результат записывается в `REG2`.
+**CINFO REG1 REG2** — Получает информацию о кассете. Тип информации задается в `REG1`, результат записывается в `REG2`.
 
 ```assembly
-CINFO R1, R2
+CINFO R1 R2
 ```
 
 #### SAVKEY
@@ -350,10 +350,10 @@ BRIGHT R1
 ```
 
 #### RND
-**RND REG, LIMIT** — Генерирует случайное число от 0 до `LIMIT` и сохраняет его в `REG`.
+**RND REG LIMIT** — Генерирует случайное число от 0 до `LIMIT` и сохраняет его в `REG`.
 
 ```assembly
-RND R1, 100
+RND R1 100
 ```
 
 ## Командная Строка Компилятора
@@ -375,13 +375,13 @@ python main.py [--cassette <section_number>] <output_file> <input_file>
 1. **Компиляция в файл**:
 
     ```bash
-    python main.py program.hex program.asm
+    python main.py program.bin program.asm
     ```
 
 2. **Компиляция в кассету**:
 
     ```bash
-    python main.py --cassette 2 cassette.dat program.asm
+    python main.py --cassette 2 cassette.cas program.asm
     ```
 
 ### Обработка Ошибок
@@ -396,89 +396,17 @@ python main.py [--cassette <section_number>] <output_file> <input_file>
 
 Программа автоматически загружается в память процессора с помощью модуля `loader.py`. Загрузка происходит из файла `boot.bin`, который содержит скомпилированный машинный код.
 
-### `ram.py`
-
-Модуль `ram.py` отвечает за управление оперативной памятью виртуального процессора.
-
-**Описание класса `ram`:**
-
-```python
-class ram:
-    def __init__(self, size):
-        self.size = size
-        self.memory = bytearray(size)
-        self.bus = 8
-        self.bank_size = 256
-        self.num_banks = size // self.bank_size
-        self.bank_addresses = [i * self.bank_size for i in range(self.num_banks)]
-        self.current_bank = 0
-        
-        # Данные начинаются с середины банка
-        self.data_addr = self.bank_size // 2  # 128
-        self.min_stack_addr = size-12
-        self.stack_addr = size-1
-
-    def get_real_address(self, addr):
-        """Преобразует локальный адрес в реальный с учетом текущего банка"""
-        if addr < self.data_addr:  # Если это адрес программы
-            return self.bank_addresses[self.current_bank] + addr
-        else:  # Если это адрес данных
-            return self.bank_addresses[self.current_bank] + addr
-
-    def switch_bank(self, bank):
-        """Переключает текущий банк"""
-        if 0 <= bank < self.num_banks:
-            self.current_bank = bank
-        else:
-            raise ValueError(f"Неверный номер банка: {bank}. Доступно банков: {self.num_banks}")
-```
-
-**Ключевые моменты:**
-
-- **Размер памяти (`size`)**: Определяется при инициализации.
-- **Банковая адресация**: Память разделена на банки по 256 байт. Текущий банк хранится в `self.current_bank`.
-- **Стек**: Инициализируется от конца памяти, начиная с `self.stack_addr`.
-
-### `loader.py`
-
-Модуль `loader.py` отвечает за загрузку программы в память.
-
-**Описание класса `loader`:**
-
-```python
-class loader:
-    def __init__(self, ram):
-        self.ram = ram
-
-    def load(self):
-        with open("boot.bin", "rb") as f:
-            program = f.read().strip().split()
-            program = [int(x, 16) for x in program]
-
-            if len(program) > self.ram.size:
-                raise ValueError("Программа слишком большая")
-
-            for i, byte in enumerate(program):
-                self.ram.memory[i] = byte
-```
-
-**Ключевые моменты:**
-
-- **Файл загрузки**: Программа должна быть скомпилирована в файл `boot.bin`.
-- **Проверка размера**: Если программа превышает размер памяти, выдается ошибка.
-- **Загрузка в память**: Машинный код загружается в начало памяти.
-
 ## Примеры Программ
 
 ### Простой Пример
 
-Программа, которая устанавливает `R1` в 10, копирует его в `R2`, добавляет `R1` к `R2` и завершает выполнение.
+Программа, которая устанавливает в `R1` число 10, копирует его в `R2`, добавляет `R1` к `R2` и завершает выполнение.
 
 ```assembly
 :START
-    SET R1, 10
-    MOV R2, R1
-    ADD R2, R1
+    SET R1 10
+    MOV R2 R1
+    ADD R2 R1
     HLT
 ```
 
@@ -489,12 +417,11 @@ class loader:
 ```assembly
 .DEFINE MAX_COUNT 0x0A
 
-DATA_SECTION:
-    .DB 0x01, 0x02, 0x03, MAX_COUNT
+.DB 0x01, 0x02, 0x03, MAX_COUNT
 
 :START
-    SET R1, MAX_COUNT
-    MOV R2, R1
+    SET R1 MAX_COUNT
+    MOV R2 R1
     ; Остальной код
     HLT
 ```
@@ -506,11 +433,11 @@ DATA_SECTION:
 ```assembly
 :START
     ; Установка адреса сохранения
-    SET R1, 0x80
+    SET R1 0x80
     SAVKEY R1
 
     ; Запись данных из памяти в кассету
-    CWRITE R1, R2
+    CWRITE R1 R2
 
     HLT
 ```
@@ -551,14 +478,10 @@ LOOP                  0x05     0:0x5
 .DEFINE START_ADDRESS 0x80
 
 :START
-    SET R1, BUFFER_SIZE
+    SET R1 BUFFER_SIZE
     ; Остальной код
     HLT
 ```
-
-### Серии Инструкций и Расширения
-
-VCPU поддерживает расширение набора инструкций через модификацию файла `instructions.py`. Это позволяет добавлять новые команды или изменять существующие для расширения функциональности процессора.
 
 ## Заключение
 
